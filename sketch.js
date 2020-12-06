@@ -1,10 +1,19 @@
+// song
 let song;
+let horn;
+let omg;
+
+// image
 let bgImg;
 let me;
+
+// camera
 let cameraCapture;
 let faceMesh;
 let predictions = [];
 let lipX;
+
+// sound effects
 let fft;
 let amp;
 let filter;
@@ -13,38 +22,79 @@ let filterFreq;
 let filterRes;
 let volHistory = [];
 
+// colors
 let col;
 let col2;
 let colWave;
 
+// soundWave
 let threshold = 400;
 let resolution = 500;
 let aveWave = 0;
 let r;
 
+// mask
 let pg;
 let movingOffsetX;
 let movingOffsetY;
 let meRatio;
 
+// socket
+let socket;
+
+// text
+const opacityDuration = 1;
+
 function preload() {
+  socket = io.connect("https://icm-socket.herokuapp.com", {
+    transports: ["websocket"],
+  });
+  // socket
+  socket.on("text", function (text) {
+    console.log(text);
+    showUpText(text);
+  });
+  socket.on("emoji", function (emoji) {
+    console.log(emoji);
+    if (emoji === "horn") horn.play();
+    if (emoji === "scream") omg.play();
+    if (emoji === "hi") showUpText("👋");
+    if (emoji === "hoo") showUpText("🤟");
+    if (emoji === "yay") showUpText("🤘");
+    if (emoji === "glass") showUpText("😎");
+    if (emoji === "pretty") showUpText("😍");
+    if (emoji === "poop") showUpText("💩");
+    if (emoji === "shine") showUpText("✨");
+    if (emoji === "heart") showUpText("💗");
+  });
+
+  // loading sounds
   song = loadSound("assets/song2.mp3");
+  horn = loadSound("assets/horn.mp3");
+  omg = loadSound("assets/ohmygosh.mp3");
+
+  // loading images
   bgImg = loadImage("assets/bg.jpg");
   me = loadImage("assets/profile.jpeg");
   copiedMe = loadImage("assets/profile.jpeg");
 
+  // preparing camera
   cameraCapture = createCapture(VIDEO);
   cameraCapture.size(400, 400);
   cameraCapture.hide();
   faceMesh = ml5.facemesh(cameraCapture, modelLoaded);
 
+  // initializing color
   col = color(0, 255, 0);
   col2 = color("hsba(250, 57%, 100%, 1)");
   colWave = color(0, 100, 255, 150);
 }
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   background(bgImg);
+
+  // about song
   song.amp(0.2);
   filter = new p5.LowPass();
   // filter2 = new p5.HighPass();
@@ -53,6 +103,8 @@ function setup() {
   fft = new p5.FFT();
   fft.setInput(song);
   r = height / 4;
+
+  // about face
   faceMesh.on("predict", (results) => {
     predictions = results;
     lipX =
@@ -91,6 +143,7 @@ function setup() {
   });
 }
 
+////////
 // When the model is loaded
 function modelLoaded() {
   console.log("Model Loaded!");
@@ -246,4 +299,61 @@ function visualizeWaveform() {
   //   width / 2 + 0.05 * width,
   //   width / (2 * meRatio) + 0.05 * width
   // );
+}
+
+function showUpText(textInput) {
+  const randX = random(0, 0.9 * width);
+  const randY = random(0, 0.9 * height);
+  const fontRand = random(1, 100);
+  const textDiv = createDiv(textInput);
+  textDiv.style("z-index: 1000");
+  textDiv.style("position: absolute");
+  textDiv.style("opacity: 0");
+  textDiv.style("left: " + randX + "px");
+  textDiv.style("top: " + randY + "px");
+  textDiv.style("font-size: " + fontRand + "px");
+  // TODO 色のランダム化
+  // TODO フォント追加
+  setTimeout(function () {
+    addOpacity(textDiv, 0, fontRand, randX);
+  }, opacityDuration);
+}
+
+function addOpacity(obj, i, fontSize, x) {
+  const newOpacity = i + 0.25;
+  const newFontSize = fontSize + 1;
+  const newX = x - 1;
+  obj.style("opacity: " + newOpacity);
+  obj.style("font-size: " + newFontSize + "px");
+  obj.style("left: " + newX + "px");
+
+  console.log("opacity");
+  if (i < 0.99) {
+    setTimeout(function () {
+      addOpacity(obj, newOpacity, newFontSize, newX);
+    }, opacityDuration);
+  } else {
+    setTimeout(function () {
+      decreaseOpacity(obj, newOpacity, newFontSize, newX);
+    }, opacityDuration);
+  }
+}
+
+function decreaseOpacity(obj, i, fontSize, x) {
+  const newOpacity = i - 0.3;
+  const newFontSize = fontSize - 1;
+  const newX = x + 1;
+
+  obj.style("opacity: " + newOpacity);
+  obj.style("font-size: " + newFontSize + "px");
+  obj.style("left: " + newX + "px");
+
+  if (i < 0) {
+    obj.remove();
+    console.log("deleted");
+  } else {
+    setTimeout(function () {
+      decreaseOpacity(obj, newOpacity, newFontSize, newX);
+    }, opacityDuration);
+  }
 }

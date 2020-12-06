@@ -1,0 +1,12 @@
+{
+  "name": "project2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:kurohune538/ICM-prj2.git",
+  "author": "Shinnosuke Komiya <kurohune538@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^3.0.3"
+  }
+}
