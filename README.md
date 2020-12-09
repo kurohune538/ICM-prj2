@@ -49,5 +49,19 @@ Audience Page(https://github.com/kurohune538/icm-audience)
 
 Socket Repository (https://github.com/kurohune538/icm-socket)
 
+## Used libraries and services
 
+### Frontend
+- p5.js
+- ml5.js
+- Next.js(React.js)
+- TailwindCSS
 
+### Backend
+- node.js
+- express
+- socket.io
+
+### Infrastructure
+- Vercel(for audience app)
+- heroku(for backend)
