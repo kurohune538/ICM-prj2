@@ -4,3 +4,5 @@ So If I make the interactive audio visualizer, I can play VJ and DJ with other a
 
 ## ICM-prj1
 At first, I made an audio visualizer itself.
+
+This document is under construction...
